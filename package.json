@@ -1,0 +1,25 @@
+{
+  "name": "argumentify",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/llafuente/argumentify.git"
+  },
+  "keywords": [
+    "arguments",
+    "falafel",
+    "browserify",
+    "jsdoc"
+  ],
+  "author": "Luis <llafuente@noboxout.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/llafuente/argumentify/issues"
+  },
+  "homepage": "https://github.com/llafuente/argumentify"
+}
