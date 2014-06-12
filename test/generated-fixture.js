@@ -51,11 +51,26 @@ if ('function' !== typeof fn) {
 
 }
 
+/**
+ * Optional test
+ * @param {Function=} fn
+ */
+function __ofunction(fn) {
+if (fn !== undefined) {
+if ('function' !== typeof fn) {
+    throw new Error("fn is not a function")
+}
+
+}
+}
+
+
 
 module.exports = {
     __number: __number,
     __boolean: __boolean,
     __array: __array,
     __object: __object,
-    __function: __function
+    __function: __function,
+    __ofunction: __ofunction
 };

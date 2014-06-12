@@ -147,3 +147,24 @@ test("test function!", function(t) {
 
     t.end();
 });
+
+test("test optional function!", function(t) {
+
+    var _throw = [{}, {abc: 1000}, null, 10, 0, true, false, NaN],
+        _no_throw =[undefined, function() {}];
+
+    _no_throw.forEach(function(val) {
+        t.doesNotThrow(function() {
+            mfixture.__ofunction(val);
+        }, "object: " + Object.prototype.toString.call(val) + (val && val.toString ? val.toString() : " ? "));
+    });
+
+    _throw.forEach(function(val) {
+        t.throws(function() {
+            mfixture.__ofunction(val);
+        }, "object: " + Object.prototype.toString.call(val) + (val && val.toString ? val.toString() : " ? "));
+    });
+
+    t.end();
+});
+

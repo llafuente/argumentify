@@ -40,7 +40,7 @@ function getArguments(node) {
     return args;
 }
 
-function getArgumentType(arg_name, docs) {
+function getArgumentDoc(arg_name, docs) {
     var i = 0,
         max = docs.tags.length;
     for (i = 0; i < max; ++i) {
@@ -60,7 +60,7 @@ function build_validator(variable_name, validations, message) {
     return out;
 }
 
-function check_name_expression(expression, arg_name) {
+function name_expression(expression, arg_name) {
     if (!validators[expression.name]) {
         verbose && console.error("no validator for: ", expression.name);
         return [];
@@ -69,6 +69,55 @@ function check_name_expression(expression, arg_name) {
     var validator = [validators[expression.name].check.join(" || ")];
     return build_validator(arg_name, [validator], validators[expression.name].message);
 }
+
+function comment_to_validation(arg_doc, arg_name, validations) {
+    validations = validations || [];
+
+    switch(arg_doc.type) {
+    case "NameExpression":
+        validations = validations.concat(name_expression(arg_doc, arg_name));
+
+        break;
+    case "OptionalType":
+        // { type: 'OptionalType', expression: { type: 'NameExpression', name: 'Vec2' } }
+        var tmp = comment_to_validation(arg_doc.expression, arg_name);
+
+        validations.push(
+            "if (" + arg_name +" !== undefined) {\n" +
+            tmp.join("\n") +
+            "\n}"
+        );
+
+        break;
+    case "UnionType":
+        var chk_union = [],
+            chk_message = [];
+
+        arg_doc.elements.forEach(function(expression) {
+            if (validators[expression.name]) {
+                // negate - OR join
+                chk_union.push("!(" + validators[expression.name].check.join(" || ") + ")");
+                chk_message.push(validators[expression.name].message);
+            } else {
+                verbose && console.error("no validator for: ", expression.name);
+            }
+        });
+
+        if (chk_union.length) {
+            validations = validations.concat(
+                build_validator(arg_name, chk_union, chk_message.join(" OR "))
+            );
+        }
+
+
+        break;
+    default:
+        verbose && console.error("unsupported / bad formatted comment @param", arg_doc);
+    }
+
+    return validations;
+}
+
 
 
 function falafel_callback(node, transformOptions, done) {
@@ -95,7 +144,7 @@ function falafel_callback(node, transformOptions, done) {
                 fn_txt = fn.body.source().trim().substring(1),
                 validations = [],
                 i,
-                type;
+                arg_doc;
 
             if (!fn_args.length) {
                 done();
@@ -104,45 +153,12 @@ function falafel_callback(node, transformOptions, done) {
 
 
             for (i in fn_args) {
-                type = getArgumentType(fn_args[i], comment);
+                arg_doc = getArgumentDoc(fn_args[i], comment);
 
-                if (!type) {
+                if (!arg_doc) {
                     verbose && console.error("missing type for: " + fn_args[i] + "\n" + fn.source());
                 } else {
-
-                    switch(type.type) {
-                    case "NameExpression":
-                        validations = validations.concat(check_name_expression(type, fn_args[i]));
-
-                        break;
-                    case "OptionalType":
-                        // { type: 'OptionalType', expression: { type: 'NameExpression', name: 'Vec2' } }
-                        verbose && console.error("OptionalType not supported");
-                        break;
-                    case "UnionType":
-                        var chk_union = [],
-                            chk_message = [];
-
-                        type.elements.forEach(function(expression) {
-                            if (validators[expression.name]) {
-                                chk_union.push("!(" + validators[expression.name].check.join(" || ") + ")");
-                                chk_message.push(validators[expression.name].message);
-                            } else {
-                                verbose && console.error("no validator for: ", expression.name);
-                            }
-                        });
-
-                        if (chk_union.length) {
-                            validations = validations.concat(
-                                build_validator(fn_args[i], chk_union, chk_message.join(" OR "))
-                            );
-                        }
-
-
-                        break;
-                    default:
-                        verbose && console.error("unsupported / bad formatted comment @param", type);
-                    }
+                    validations = validations.concat(comment_to_validation(arg_doc, fn_args[i]));
                 }
             }
 
@@ -204,7 +220,7 @@ module.exports.check.Number = function (sufix) {
     return [
         "%var-name%" + sufix + " == undefined",
         "Number.isNaN(%var-name%" + sufix + ")",
-        "'number' !== typeof %var-name%"
+        "'number' !== typeof %var-name%" + sufix
     ];
 };
 

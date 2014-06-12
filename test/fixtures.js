@@ -31,11 +31,20 @@ function __object(o) {
 function __function(fn) {
 }
 
+/**
+ * Optional test
+ * @param {Function=} fn
+ */
+function __ofunction(fn) {
+}
+
+
 
 module.exports = {
     __number: __number,
     __boolean: __boolean,
     __array: __array,
     __object: __object,
-    __function: __function
+    __function: __function,
+    __ofunction: __ofunction
 };
