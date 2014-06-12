@@ -1,7 +1,7 @@
 {
   "name": "argumentify",
-  "version": "0.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "From JSDoc info make sure that your arguments are valid rewriting your function with falafel",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,5 +21,13 @@
   "bugs": {
     "url": "https://github.com/llafuente/argumentify/issues"
   },
-  "homepage": "https://github.com/llafuente/argumentify"
+  "homepage": "https://github.com/llafuente/argumentify",
+  "dependencies": {
+    "browserify-transform-tools": "^1.2.1",
+    "doctrine": "^0.5.1"
+  },
+  "devDependencies": {
+    "browserify": "^4.1.9",
+    "tap": "^0.4.11"
+  }
 }
