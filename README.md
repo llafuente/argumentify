@@ -1,14 +1,16 @@
-# Argumentify
+# Argumentify [![Build Status](https://secure.travis-ci.org/llafuente/argumentify.png?branch=master)](http://travis-ci.org/llafuente/argumentify)
 
-From JSDoc info make sure that your arguments are valid appending validation code at the beginning of your functions with falafel.
+From JSDoc info make sure that your arguments are valid appending validation code at the beginning of your functions using falafel.
 
-## What does means ?
+## What does this means ?
 
 ```js
 /**
  * @param {Number} x
  */
 function test(x) {
+
+    // your code wont be modified!
 }
 ```
 
@@ -22,20 +24,22 @@ function __number(x) {
 if (x == undefined || Number.isNaN(x) || 'number' !== typeof x) {
     throw new Error("x is undefined or null")
 }
-
+    // your code wont be modified!
 }
 ```
 
-Cool! So you comment your function and forget about it
+So your comments generate code... at last!
 
 
 ## Gotchas
 
 Today, it only works with functions at the first level.
+
 I will dig a bit in the next weeks to support functions inside IFFE/SIF and prototypes.
+
 A PR is welcome for sure :)
 
-## Usage:
+## Usage
 
 **Browserify transform**
 
@@ -101,3 +105,7 @@ ArrayOfNumbers(n);
 MultiArrayOfNumbers(n, m)
 
 ```
+
+## License
+
+MIT

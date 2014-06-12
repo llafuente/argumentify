@@ -3,8 +3,12 @@
   "version": "0.0.1",
   "description": "From JSDoc info make sure that your arguments are valid rewriting your function with falafel",
   "main": "index.js",
+  "directories": {
+    "lib": ".",
+    "test": "test"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tap test/test-*.js"
   },
   "repository": {
     "type": "git",
@@ -16,7 +20,11 @@
     "browserify",
     "jsdoc"
   ],
-  "author": "Luis <llafuente@noboxout.com>",
+  "author": {
+    "name": "Luis Lafuente",
+    "email": "llafuente@noboxout.com",
+    "url": "http://www.noboxout.com"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/llafuente/argumentify/issues"
