@@ -32,7 +32,8 @@
   "homepage": "https://github.com/llafuente/argumentify",
   "dependencies": {
     "browserify-transform-tools": "^1.2.1",
-    "doctrine": "^0.5.1"
+    "doctrine": "^0.5.1",
+    "cssauron-falafel": "^1.2.1"
   },
   "devDependencies": {
     "browserify": "^4.1.9",

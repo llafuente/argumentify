@@ -2,7 +2,7 @@
 
 From JSDoc info make sure that your arguments are valid appending validation code at the beginning of your functions using falafel.
 
-## What does this means ?
+## What does this means?
 
 ```js
 /**
@@ -31,14 +31,6 @@ if (x == undefined || Number.isNaN(x) || 'number' !== typeof x) {
 So your comments generate code... at last!
 
 
-## Gotchas
-
-Today, it only works with functions at the first level.
-
-I will dig a bit in the next weeks to support functions inside IFFE/SIF and prototypes.
-
-A PR is welcome for sure :)
-
 ## Usage
 
 **Browserify transform**
@@ -48,6 +40,7 @@ output_stream = fs.createWriteStream('debug/js-2dmath-browser-debug.js');
 
 require('browserify')('./index.js')
     .transform('argumentify')
+    //or: .transform(require('argumentify').verbose())
     .bundle()
     .pipe(output_stream);
 ```
@@ -83,25 +76,28 @@ argumentify.customValidators({
 // This is the falafel callaback that transform your code
 argumentify.falafel;
 
-// return the array with default Number check
+// return the array with default String check (typeof)
+argumentify.check.String();
+
+// return the array with default Number check (typeof, !isNaN)
 argumentify.check.Number();
 
-// return the array with default Boolean check
+// return the array with default Boolean check (typeof)
 argumentify.check.Boolean();
 
-// return the array with default Array check
+// return the array with default Array check (Array.isArray)
 argumentify.check.Array();
 
-// return the array with default Object check
+// return the array with default Object check (typeof, !Array.isArray)
 argumentify.check.Object();
 
-// return the array with default Function check
+// return the array with default Function check (typeof)
 argumentify.check.Function();
 
-// return the array with default fixed size array of numbers check
+// return the array with default fixed size array of numbers check (...)
 ArrayOfNumbers(n);
 
-// return the array with default fixed size 2 levels array of numbers check
+// return the array with default fixed size 2 levels array of numbers check (...)
 MultiArrayOfNumbers(n, m)
 
 ```

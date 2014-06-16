@@ -1,20 +1,62 @@
 var doctrine = require("doctrine"),
     validators = {},
-    verbose = false;
+    verbose = false,
+    selector = require('cssauron-falafel'),
+    is_function = selector("function");
+
+var objectKeys = Object.keys || function (obj) {
+    var keys = [];
+    for (var key in obj) keys.push(key);
+    return keys;
+};
+var forEach = function (xs, fn) {
+    if (xs.forEach) return xs.forEach(fn);
+    for (var i = 0; i < xs.length; i++) {
+        fn.call(xs, xs[i], i, xs);
+    }
+};
+
+
+function filter_walk(node, parent, fn) {
+    var out = [];
+
+    forEach(objectKeys(node), function (key) {
+        if (key === 'parent') return;
+
+        var child = node[key];
+        if (Array.isArray(child)) {
+            forEach(child, function (c) {
+                if (c && typeof c.type === 'string') {
+                    out = out.concat(filter_walk(c, node, fn));
+                }
+            });
+        } else if (child && typeof child.type === 'string') {
+            out = out.concat(filter_walk(child, node, fn));
+        }
+    });
+
+    if (fn(node)) {
+        out.push(node);
+    }
+
+    return out;
+};
 
 function getNearestFunction(node, max_distance) {
     // search nearest function
     var fn = null,
         min_diff = max_distance || 9999;
 
-    node.parent.body.every(function (subnode) {
-        if (subnode.type === "FunctionDeclaration") {
-            var diff = subnode.loc.start.line - node.loc.end.line;
+    var functions = filter_walk(node.parent.body, node.parent, function(node) {
+        return is_function(node);
+    });
 
-            if (diff > 0 && diff < min_diff) {
-                min_diff = diff;
-                fn = subnode;
-            }
+    functions.forEach(function (subnode) {
+        var diff = subnode.loc.start.line - node.loc.end.line;
+
+        if (diff > 0 && diff < min_diff) {
+            min_diff = diff;
+            fn = subnode;
         }
 
         return true;
@@ -29,7 +71,8 @@ function getArguments(node) {
         i,
         max;
 
-    if (node.type === "FunctionDeclaration" && node.id && node.id.name) {
+    if ((node.type === "FunctionDeclaration" || node.type === "FunctionExpression")
+         && node.id && node.id.name) {
         for (i = 0, max = node.params.length; i < max; ++i) {
             arg = node.params[i].name;
 
@@ -122,6 +165,7 @@ function comment_to_validation(arg_doc, arg_name, validations) {
 
 function falafel_callback(node, transformOptions, done) {
     //console.log(node);
+    //console.log(node);
     // gather information from comments
     // comment block & ignore header!
     if (node.type === "Block" && node.loc.start.line !== 1) {
@@ -136,6 +180,8 @@ function falafel_callback(node, transformOptions, done) {
             fn = getNearestFunction(node, 10);
 
         if (fn !== null) {
+            //console.log("*********************************");
+            //console.log("*********************************");
             //console.log(node.source());
             //console.log(comment);
             //console.log(fn.source());
@@ -162,14 +208,17 @@ function falafel_callback(node, transformOptions, done) {
                 }
             }
 
+            //console.log("validations", validations);
             if (validations.length) {
                 fn.body.update("{\n" + validations.join("\n") + fn_txt);
             }
 
             //console.log(fn.source());
         } else if (source.indexOf("/**") === 0) {
+            console.log(node);
+            console.log(require("util").inspect(node, {depth: 7, colors: true}));
             // only display this message for jsdoc comments
-            verbose && console.error("cant find function for: " + source);
+            verbose && console.error("can't find function for: " + source);
         }
 
         //console.log();
@@ -221,6 +270,12 @@ module.exports.check.Number = function (sufix) {
         "%var-name%" + sufix + " == undefined",
         "Number.isNaN(%var-name%" + sufix + ")",
         "'number' !== typeof %var-name%" + sufix
+    ];
+};
+
+module.exports.check.String = function () {
+    return [
+        "'string' !== typeof %var-name%"
     ];
 };
 
@@ -277,6 +332,10 @@ module.exports.customValidators = function(vals) {
 module.exports.customValidators({
     Number: {
         check: module.exports.check.Number(),
+        message: '%var-name% is undefined or null'
+    },
+    String: {
+        check: module.exports.check.String(),
         message: '%var-name% is undefined or null'
     },
     Boolean: {
