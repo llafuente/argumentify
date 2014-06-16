@@ -1,7 +1,7 @@
 {
   "name": "argumentify",
   "version": "0.0.1",
-  "description": "From JSDoc info make sure that your arguments are valid rewriting your function with falafel",
+  "description": "From JSDoc info make sure that your arguments are valid appending validation code at the beginning of your functions using falafel.",
   "main": "index.js",
   "directories": {
     "lib": ".",

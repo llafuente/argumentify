@@ -1,6 +1,6 @@
 # Argumentify [![Build Status](https://secure.travis-ci.org/llafuente/argumentify.png?branch=master)](http://travis-ci.org/llafuente/argumentify)
 
-From JSDoc info make sure that your arguments are valid appending validation code at the beginning of your functions using falafel.
+From JSDoc info make sure that your arguments are valid appending validation code at the beginning of your functions using [https://github.com/substack/node-falafel](falafel).
 
 ## What does this means?
 
@@ -14,7 +14,7 @@ function test(x) {
 }
 ```
 
-Will be rewrited to:
+Will be rewritten to:
 
 ```js
 /**
